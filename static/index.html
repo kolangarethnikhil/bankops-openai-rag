@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BankOps OpenAI RAG Assistant</title>
+  <style>
+    :root {
+      --bg: #f5f8fb;
+      --surface: #ffffff;
+      --ink: #0f172a;
+      --muted: #526071;
+      --border: #d7e1ea;
+      --primary: #0f766e;
+      --primary-dark: #115e59;
+      --danger: #b91c1c;
+      --warning: #b45309;
+      --info: #0369a1;
+      --shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 85% 0%, rgba(3, 105, 161, 0.16), transparent 23rem),
+        linear-gradient(135deg, rgba(15, 118, 110, 0.12), transparent 34rem),
+        var(--bg);
+    }
+    button, textarea, input { font: inherit; }
+    button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus-visible {
+      outline: 3px solid rgba(15, 118, 110, 0.28);
+      outline-offset: 2px;
+    }
+    .shell { width: min(1500px, calc(100% - 36px)); margin: 0 auto; padding: 24px 0 36px; }
+    .top { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 18px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .mark { width: 52px; height: 52px; border-radius: 8px; background: var(--primary); display: grid; place-items: center; color: white; box-shadow: var(--shadow); }
+    .icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 2px; font-size: clamp(1.55rem, 3vw, 2.35rem); letter-spacing: 0; line-height: 1.05; }
+    h2 { margin-bottom: 0; font-size: 1.12rem; }
+    h3 { margin-bottom: 8px; font-size: 1rem; }
+    .eyebrow { margin: 0; color: var(--muted); font-size: 0.76rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+    .actions, .chips, .source-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .pill { display: inline-flex; align-items: center; min-height: 30px; padding: 5px 10px; border: 1px solid var(--border); border-radius: 999px; background: white; color: var(--muted); font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
+    .pill.info { border-color: rgba(3, 105, 161, 0.2); background: #eff6ff; color: var(--info); }
+    .pill.warn { border-color: rgba(180, 83, 9, 0.24); background: #fffbeb; color: var(--warning); }
+    .grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 16px; }
+    .panel, .kb-card { border: 1px solid var(--border); border-radius: 8px; background: rgba(255, 255, 255, 0.94); box-shadow: var(--shadow); }
+    .panel { padding: 18px; }
+    label { display: block; margin: 16px 0 8px; font-weight: 700; }
+    textarea { width: 100%; min-height: 178px; resize: vertical; border: 1px solid var(--border); border-radius: 8px; padding: 12px; line-height: 1.5; color: var(--ink); background: #fbfdff; }
+    .check { display: flex; gap: 9px; align-items: flex-start; margin: 12px 0; color: var(--muted); line-height: 1.4; }
+    .check input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--primary); }
+    .btn { width: 100%; min-height: 48px; border: 0; border-radius: 8px; padding: 12px 16px; color: white; background: var(--primary); font-weight: 700; cursor: pointer; }
+    .btn:hover { background: var(--primary-dark); }
+    .samples { display: grid; gap: 8px; margin-top: 16px; }
+    .sample { border: 1px solid var(--border); border-radius: 8px; padding: 10px; background: white; text-align: left; cursor: pointer; line-height: 1.35; }
+    .answer { min-height: 380px; border-left: 4px solid var(--primary); border-radius: 8px; padding: 16px; background: #f8fafc; line-height: 1.6; white-space: pre-wrap; }
+    .meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 12px; }
+    .metric { border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: white; }
+    .metric span { display: block; margin-bottom: 6px; color: var(--muted); font-size: 0.74rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+    .metric strong { color: var(--primary-dark); }
+    .kb { margin-top: 16px; }
+    .kb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 10px; }
+    .kb-card { padding: 14px; }
+    .kb-card p { color: var(--muted); line-height: 1.45; }
+    .tag { display: inline-flex; min-height: 24px; align-items: center; border-radius: 999px; padding: 3px 8px; background: #eef2f7; color: #334155; font-size: 0.72rem; font-weight: 700; }
+    details { margin-top: 12px; }
+    summary { color: var(--primary-dark); font-weight: 700; cursor: pointer; }
+    pre { overflow: auto; max-height: 280px; border-radius: 8px; padding: 12px; background: #0f172a; color: #e2e8f0; font-size: 0.78rem; line-height: 1.45; }
+    .muted { color: var(--muted); line-height: 1.5; }
+    @media (max-width: 1120px) { .grid, .kb-grid { grid-template-columns: 1fr; } .meta { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 720px) { .shell { width: min(100% - 24px, 1500px); } .top { align-items: flex-start; flex-direction: column; } .meta { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="top">
+      <div class="brand">
+        <div class="mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" class="icon"><path d="M4 19V5"/><path d="M8 19v-7"/><path d="M12 19V8"/><path d="M16 19v-4"/><path d="M20 19V9"/></svg>
+        </div>
+        <div>
+          <p class="eyebrow">Synthetic Indian BankOps RAG</p>
+          <h1>BankOps OpenAI RAG Assistant</h1>
+        </div>
+      </div>
+      <div class="actions">
+        <span class="pill info">Server-side OpenAI API</span>
+        <span class="pill info">RBI-source synthetic KB</span>
+        <span class="pill warn">No client data</span>
+      </div>
+    </header>
+
+    <section class="grid">
+      <div class="panel">
+        <p class="eyebrow">Ask a banking operations question</p>
+        <h2>RAG Query Console</h2>
+        <label for="question">Question</label>
+        <textarea id="question">Customer reported an unauthorized UPI transaction 5 working days after the SMS alert. What should the bank operations agent do?</textarea>
+        <label class="check">
+          <input type="checkbox" id="useWeb" />
+          <span>Enable public web verification through OpenAI hosted web search. Use this only for public RBI/NPCI-style checks.</span>
+        </label>
+        <button class="btn" id="ask">Run grounded answer</button>
+        <div class="samples">
+          <button class="sample">Can we open a company account if beneficial owner is not verified?</button>
+          <button class="sample">A card fraud complaint is unresolved after 90 days. What is the next action?</button>
+          <button class="sample">What KYC checks are needed for an individual customer account?</button>
+          <button class="sample">A high risk PEP customer is onboarding remotely. What controls are needed?</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <p class="eyebrow">Grounded response</p>
+        <h2>Assistant Answer</h2>
+        <div class="answer" id="answer">Run a question to see the grounded answer, citations, risk, and trace.</div>
+        <div class="meta">
+          <div class="metric"><span>Mode</span><strong id="mode">-</strong></div>
+          <div class="metric"><span>Risk</span><strong id="risk">-</strong></div>
+          <div class="metric"><span>Confidence</span><strong id="confidence">-</strong></div>
+          <div class="metric"><span>Citations</span><strong id="citations">-</strong></div>
+        </div>
+        <p class="muted" id="nextAction"></p>
+        <details>
+          <summary>View trace JSON</summary>
+          <pre id="trace">{}</pre>
+        </details>
+      </div>
+    </section>
+
+    <section class="kb">
+      <p class="eyebrow">Synthetic KB library</p>
+      <h2>Public-Source Banking Policy Pack</h2>
+      <p class="muted">These are synthetic operating KBs created from public RBI-style regulatory facts. They are not copied client policies.</p>
+      <div class="kb-grid" id="kbGrid"></div>
+    </section>
+  </main>
+
+  <script>
+    const question = document.getElementById("question");
+    const ask = document.getElementById("ask");
+    const useWeb = document.getElementById("useWeb");
+    const answer = document.getElementById("answer");
+    const mode = document.getElementById("mode");
+    const risk = document.getElementById("risk");
+    const confidence = document.getElementById("confidence");
+    const citations = document.getElementById("citations");
+    const nextAction = document.getElementById("nextAction");
+    const trace = document.getElementById("trace");
+    const kbGrid = document.getElementById("kbGrid");
+
+    async function loadKb() {
+      const response = await fetch("/api/kb");
+      const data = await response.json();
+      kbGrid.innerHTML = data.kb.map((item) => `
+        <article class="kb-card">
+          <div class="source-row"><span class="tag">${item.id}</span><span class="tag">${item.risk}</span></div>
+          <h3>${escapeHtml(item.title)}</h3>
+          <p>${escapeHtml(item.text)}</p>
+          <div class="chips">${item.tags.slice(0, 4).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>
+        </article>
+      `).join("");
+    }
+
+    async function runAsk() {
+      ask.disabled = true;
+      ask.textContent = "Running...";
+      answer.textContent = "Retrieving KB context and generating answer...";
+      try {
+        const response = await fetch("/api/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question: question.value, useWeb: useWeb.checked })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Request failed");
+        answer.textContent = data.answer || "";
+        mode.textContent = data.mode || "-";
+        risk.textContent = data.risk || "-";
+        confidence.textContent = data.confidence || "-";
+        citations.textContent = (data.citations || []).join(", ") || "-";
+        nextAction.textContent = data.next_action ? `Next action: ${data.next_action}` : "";
+        trace.textContent = JSON.stringify(data.trace || data, null, 2);
+      } catch (error) {
+        answer.textContent = error.message;
+      } finally {
+        ask.disabled = false;
+        ask.textContent = "Run grounded answer";
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+    }
+
+    document.querySelectorAll(".sample").forEach((button) => {
+      button.addEventListener("click", () => {
+        question.value = button.textContent;
+      });
+    });
+    ask.addEventListener("click", runAsk);
+    loadKb();
+  </script>
+</body>
+</html>
