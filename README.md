@@ -1,4 +1,4 @@
-# BankOps OpenAI RAG Assistant
+﻿# BankOps OpenAI RAG Assistant
 
 No-npm hackathon prototype for a Banking Operations RAG assistant.
 
