@@ -2,7 +2,7 @@
 
 No-npm hackathon prototype for a Banking Operations RAG assistant.
 
-It uses synthetic Indian banking operations KBs derived from public RBI regulatory information and answers with citations, risk level, next action, and trace data. It can call the OpenAI Responses API from the Python backend when `OPENAI_API_KEY` is configured.
+It uses synthetic Indian banking operations KBs derived from public RBI regulatory information and answers with Markdown, citations, risk level, and next action. Technical retrieval trace stays in the API payload for FlowProof-style evaluation, but the user UI only shows the answer and source chips. It can call the OpenAI Responses API from the Python backend when `OPENAI_API_KEY` is configured.
 
 ## Why this is safe
 
@@ -15,7 +15,7 @@ It uses synthetic Indian banking operations KBs derived from public RBI regulato
 ## Run
 
 ```powershell
-cd "C:\Users\nk080714\Documents\test\bankops-openai-rag"
+cd "C:\Hackathon\Banking Operations RAG assistant\bankops-openai-rag"
 python app.py
 ```
 
@@ -27,13 +27,21 @@ http://127.0.0.1:8787
 
 ## Enable OpenAI
 
+Create or edit `.env` in the project root:
+
+```text
+OPENAI_API_KEY=your_key_here
+OPENAI_MODEL=gpt-4.1-mini
+PORT=8787
+```
+
+Then run:
+
 ```powershell
-$env:OPENAI_API_KEY="your_key_here"
-$env:OPENAI_MODEL="gpt-4.1-mini"
 python app.py
 ```
 
-If `OPENAI_API_KEY` is not set, the app runs in deterministic offline fallback mode.
+The `.env` file is ignored by git, so the real API key does not get committed. If `OPENAI_API_KEY` is not set, the app runs in deterministic offline fallback mode.
 
 ## Test
 
@@ -50,4 +58,4 @@ python -m unittest discover -s tests -v
 
 ## Demo positioning
 
-This is the target assistant. FlowProof can then evaluate whether this assistant is safe enough for production-like banking operations workflows.
+This is the target assistant. FlowProof can then evaluate the backend trace separately while the main demo remains a normal chatbot experience.

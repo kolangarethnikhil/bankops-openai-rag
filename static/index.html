@@ -6,22 +6,23 @@
   <title>BankOps Assistant</title>
   <style>
     :root {
-      --bg: #080a0e;
-      --rail: #101318;
-      --rail-2: #151920;
-      --panel: #0b0d11;
-      --panel-2: #1c2028;
-      --line: #242a34;
-      --line-strong: #333a46;
-      --text: #f4f6fb;
-      --muted: #969eac;
-      --soft: #c7ced9;
-      --accent: #0ea5a0;
-      --accent-2: #7c9cff;
-      --danger: #f87171;
-      --warning: #fbbf24;
-      --success: #34d399;
-      --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-soft: #eef3f8;
+      --sidebar: #111827;
+      --sidebar-soft: #1f2937;
+      --line: #d9e2ec;
+      --line-strong: #bfccd9;
+      --text: #0f172a;
+      --muted: #637083;
+      --subtle: #8a96a8;
+      --accent: #047d82;
+      --accent-strong: #075e63;
+      --accent-soft: #d9f3f1;
+      --blue: #1d4ed8;
+      --danger: #b91c1c;
+      --warning: #9a5b00;
+      --shadow: 0 22px 70px rgba(15, 23, 42, 0.11);
     }
 
     * { box-sizing: border-box; }
@@ -32,277 +33,199 @@
       overflow: hidden;
       color: var(--text);
       background: var(--bg);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      letter-spacing: 0;
     }
 
-    button, textarea, input { font: inherit; }
+    button, textarea { font: inherit; }
     button { cursor: pointer; }
-    button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus-visible {
-      outline: 3px solid rgba(14, 165, 160, 0.35);
+    button:focus-visible, textarea:focus-visible, a:focus-visible {
+      outline: 3px solid rgba(4, 125, 130, 0.28);
       outline-offset: 2px;
     }
 
     .app-shell {
       height: 100dvh;
       display: grid;
-      grid-template-columns: 316px minmax(0, 1fr);
-      background: radial-gradient(circle at 68% 18%, rgba(14, 165, 160, 0.08), transparent 28rem), var(--bg);
+      grid-template-columns: 292px minmax(0, 1fr);
+      background: linear-gradient(180deg, #f9fbfd 0%, #eef3f8 100%);
     }
+
+    #appShell { min-height: 100dvh; }
 
     .sidebar {
       min-height: 0;
       display: flex;
       flex-direction: column;
-      border-right: 1px solid var(--line);
-      background: linear-gradient(180deg, #12161c 0%, #0e1116 100%);
+      color: #e5edf7;
+      background: var(--sidebar);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .side-head {
+    .brand {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 18px 20px;
-      border-bottom: 1px solid var(--line);
+      padding: 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .logo {
-      width: 44px;
-      height: 44px;
-      flex: 0 0 auto;
+    .brand-mark {
+      width: 42px;
+      height: 42px;
       display: grid;
       place-items: center;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #303743, #545b67);
-      color: #fff;
-      font-weight: 800;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      color: #ffffff;
+      background: linear-gradient(135deg, #047d82, #1d4ed8);
+      font-weight: 900;
     }
 
-    .brand-title {
+    .brand h1 {
       margin: 0;
-      font-size: 1rem;
+      font-size: 0.96rem;
       font-weight: 800;
-      letter-spacing: 0.1em;
     }
 
-    .brand-subtitle {
+    .brand p {
       margin: 2px 0 0;
-      color: var(--muted);
-      font-size: 0.76rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .icon-btn, .new-chat, .tool-btn, .sample-card, .mode-btn {
-      border: 1px solid var(--line);
-      color: var(--text);
-      background: rgba(255, 255, 255, 0.03);
-      transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
-    }
-
-    .icon-btn:hover, .new-chat:hover, .tool-btn:hover, .sample-card:hover, .mode-btn:hover {
-      border-color: var(--line-strong);
-      background: rgba(255, 255, 255, 0.06);
-    }
-
-    .icon-btn {
-      width: 46px;
-      height: 46px;
-      display: grid;
-      place-items: center;
-      margin-left: auto;
-      border-radius: 8px;
-    }
-
-    .icon {
-      width: 20px;
-      height: 20px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 1.8;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      color: #9ca9bc;
+      font-size: 0.78rem;
     }
 
     .new-chat {
-      min-height: 58px;
+      min-height: 48px;
       margin: 16px;
-      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
       padding: 0 14px;
-      font-weight: 800;
-      text-align: left;
+      color: #f8fafc;
+      background: rgba(255, 255, 255, 0.06);
+      font-weight: 750;
+      transition: background 160ms ease, border-color 160ms ease;
     }
 
-    .kbd {
-      border-radius: 999px;
-      padding: 5px 10px;
-      background: rgba(255, 255, 255, 0.07);
-      color: var(--muted);
-      font-size: 0.78rem;
-      font-weight: 800;
+    .new-chat:hover {
+      border-color: rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.1);
     }
 
-    .history {
-      min-height: 0;
-      flex: 1;
-      overflow: auto;
+    .sidebar-section {
       padding: 0 16px 16px;
     }
 
-    .history-title, .tool-title {
-      margin: 18px 8px 10px;
-      color: #7e8797;
-      font-size: 0.76rem;
-      font-weight: 900;
-      letter-spacing: 0.12em;
+    .section-label {
+      margin: 10px 4px 10px;
+      color: #8896aa;
+      font-size: 0.72rem;
+      font-weight: 800;
       text-transform: uppercase;
+      letter-spacing: 0.12em;
     }
 
-    .history-item {
-      width: 100%;
-      min-height: 42px;
-      border: 0;
-      border-radius: 8px;
-      padding: 8px 10px;
-      background: transparent;
-      color: #d3d7df;
-      text-align: left;
-      font-weight: 700;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    .prompt-list {
+      display: grid;
+      gap: 8px;
     }
 
-    .history-item:hover { background: rgba(255, 255, 255, 0.04); }
-
-    .tools {
-      border-top: 1px solid var(--line);
-      padding: 12px 16px;
-    }
-
-    .tool-btn {
+    .prompt-button {
       width: 100%;
       min-height: 44px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border-radius: 8px;
-      border-color: transparent;
+      border: 0;
+      border-radius: 9px;
+      padding: 10px 11px;
+      color: #d8e1ee;
       background: transparent;
-      color: #d5dae4;
-      padding: 0 10px;
       text-align: left;
-      font-weight: 800;
+      line-height: 1.35;
+      transition: background 160ms ease, color 160ms ease;
     }
 
-    .profile {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 8px 12px 14px;
+    .prompt-button:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .sidebar-note {
+      margin-top: auto;
+      padding: 16px;
+    }
+
+    .safety-box {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
       padding: 12px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.05);
+      color: #b8c4d6;
+      font-size: 0.82rem;
+      line-height: 1.45;
     }
 
-    .avatar {
-      width: 38px;
-      height: 38px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      background: #353b46;
-      color: #fff;
-      font-weight: 900;
-    }
-
-    .profile strong { display: block; font-size: 0.9rem; }
-    .profile span { display: block; margin-top: 2px; color: var(--muted); font-size: 0.78rem; }
-
-    .workspace {
+    .main {
       min-width: 0;
       min-height: 0;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 360px;
-      gap: 14px;
-      padding: 14px 16px 16px 12px;
-    }
-
-    .chat-panel, .source-drawer {
-      min-height: 0;
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      background: rgba(9, 11, 15, 0.92);
-      box-shadow: var(--shadow);
-    }
-
-    .chat-panel {
-      display: grid;
-      grid-template-rows: 70px minmax(0, 1fr) auto;
-      overflow: hidden;
+      grid-template-rows: auto minmax(0, 1fr) auto;
     }
 
     .topbar {
+      min-height: 68px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      padding: 0 22px;
+      gap: 16px;
+      padding: 0 32px;
       border-bottom: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(14px);
     }
 
-    .title-lockup { display: flex; align-items: center; gap: 12px; }
-    .title-lockup h1 { margin: 0; font-size: 1.02rem; letter-spacing: 0.16em; }
-    .title-lockup p { margin: 3px 0 0; color: var(--muted); font-size: 0.76rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+    .topbar-title h2 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 850;
+    }
 
-    .modes {
+    .topbar-title p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .status-row {
       display: flex;
-      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
       gap: 8px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 4px;
-      background: #11151b;
     }
-
-    .mode-btn {
-      min-height: 36px;
-      border-radius: 14px;
-      padding: 0 13px;
-      border: 0;
-      color: #aeb7c5;
-      font-weight: 800;
-      background: transparent;
-    }
-
-    .mode-btn.active { color: #fff; background: #242934; }
 
     .status-pill {
-      min-height: 36px;
+      min-height: 34px;
       display: inline-flex;
       align-items: center;
       border: 1px solid var(--line);
       border-radius: 999px;
-      padding: 0 13px;
-      color: #cbd5e1;
-      background: #11151b;
-      font-size: 0.84rem;
+      padding: 0 12px;
+      color: #334155;
+      background: #ffffff;
+      font-size: 0.8rem;
       font-weight: 700;
       white-space: nowrap;
+    }
+
+    .status-pill.active {
+      border-color: #87d5d0;
+      color: var(--accent-strong);
+      background: var(--accent-soft);
     }
 
     .message-list {
       min-height: 0;
       overflow: auto;
-      padding: 28px 24px 22px;
-      scroll-behavior: smooth;
+      padding: 34px 28px 26px;
     }
 
     .hero-state {
@@ -311,473 +234,537 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 26px;
-      text-align: center;
+      gap: 28px;
       padding-bottom: 10vh;
+      text-align: center;
     }
 
-    .hero-state h2 {
+    .hero-state h3 {
       margin: 0;
-      font-size: clamp(3rem, 8vw, 5.6rem);
-      line-height: 0.95;
-      letter-spacing: 0;
+      font-size: clamp(2.5rem, 7vw, 5.2rem);
+      line-height: 0.96;
       font-weight: 900;
+      color: #0b1220;
     }
 
     .hero-state p {
-      max-width: 670px;
-      margin: 0;
+      max-width: 680px;
+      margin: 0 auto;
       color: var(--muted);
-      font-size: clamp(1rem, 1.5vw, 1.18rem);
-      line-height: 1.55;
+      font-size: clamp(1rem, 1.35vw, 1.13rem);
+      line-height: 1.6;
     }
 
-    .sample-row {
+    .quick-grid {
+      width: min(900px, 100%);
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 12px;
-      width: min(900px, 100%);
     }
 
-    .sample-card {
-      min-height: 114px;
-      border-radius: 18px;
-      padding: 14px 16px;
+    .quick-card {
+      min-height: 116px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 15px 16px;
+      background: #ffffff;
+      color: var(--text);
       text-align: left;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+      transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
     }
 
-    .sample-card small {
+    .quick-card:hover {
+      border-color: var(--line-strong);
+      transform: translateY(-1px);
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.09);
+    }
+
+    .quick-card small {
       display: inline-flex;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       border-radius: 999px;
-      padding: 5px 10px;
-      color: var(--soft);
-      background: rgba(255, 255, 255, 0.05);
-      font-weight: 900;
-      letter-spacing: 0.06em;
+      padding: 4px 9px;
+      color: var(--accent-strong);
+      background: var(--accent-soft);
+      font-size: 0.72rem;
+      font-weight: 850;
       text-transform: uppercase;
     }
 
-    .sample-card strong { display: block; margin-bottom: 7px; font-size: 1rem; }
-    .sample-card span { color: var(--muted); line-height: 1.35; }
+    .quick-card strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+
+    .quick-card span {
+      color: var(--muted);
+      line-height: 1.4;
+    }
 
     .message {
-      display: grid;
-      grid-template-columns: 38px minmax(0, 1fr);
-      gap: 12px;
-      width: min(920px, 100%);
+      width: min(860px, 100%);
       margin: 0 auto 18px;
+      display: grid;
+      grid-template-columns: 36px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
     }
 
-    .message.user { grid-template-columns: minmax(0, 1fr) 38px; }
-    .message.user .bubble { grid-column: 1; justify-self: end; background: #202530; border-color: #343c4a; }
-    .message.user .avatar { grid-column: 2; grid-row: 1; }
+    .message.user {
+      grid-template-columns: minmax(0, 1fr) 36px;
+    }
 
-    .bubble {
+    .message.user .message-avatar {
+      grid-column: 2;
+      grid-row: 1;
+      background: #334155;
+    }
+
+    .message.user .message-body {
+      justify-self: end;
+      background: #e7eef7;
+      border-color: #d1dce8;
+    }
+
+    .message-avatar {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #ffffff;
+      background: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 850;
+    }
+
+    .message-body {
+      min-width: 0;
       border: 1px solid var(--line);
-      border-radius: 18px;
+      border-radius: 13px;
       padding: 14px 16px;
-      background: #141820;
-      color: #f3f6fb;
-      line-height: 1.55;
-      white-space: pre-wrap;
+      background: #ffffff;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+      line-height: 1.58;
     }
 
-    .bubble-meta {
+    .message-body h3 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      line-height: 1.35;
+    }
+
+    .message-body p {
+      margin: 0 0 10px;
+    }
+
+    .message-body p:last-child, .message-body ul:last-child, .message-body ol:last-child {
+      margin-bottom: 0;
+    }
+
+    .message-body ul, .message-body ol {
+      margin: 0 0 12px;
+      padding-left: 1.35rem;
+    }
+
+    .message-body li {
+      margin: 5px 0;
+    }
+
+    .source-list {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 12px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
     }
 
-    .mini-pill {
+    .source-chip {
       display: inline-flex;
       align-items: center;
-      min-height: 26px;
+      min-height: 30px;
+      border: 1px solid #b9dedb;
       border-radius: 999px;
-      padding: 4px 8px;
-      background: rgba(14, 165, 160, 0.12);
-      color: #8ee3df;
-      font-size: 0.75rem;
+      padding: 5px 10px;
+      color: var(--accent-strong);
+      background: var(--accent-soft);
+      font-size: 0.78rem;
       font-weight: 800;
+      text-decoration: none;
+    }
+
+    .source-chip.neutral {
+      border-color: var(--line);
+      color: #475569;
+      background: #f8fafc;
     }
 
     .composer-wrap {
-      padding: 12px 24px 22px;
-      background: linear-gradient(180deg, transparent, rgba(8, 10, 14, 0.92) 28%);
+      padding: 16px 28px 24px;
+      background: linear-gradient(180deg, rgba(245, 247, 251, 0), rgba(245, 247, 251, 0.96) 30%);
     }
 
     .composer {
-      width: min(1180px, 100%);
-      min-height: 92px;
+      width: min(920px, 100%);
+      min-height: 78px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: 48px minmax(0, 1fr) 48px 56px;
+      grid-template-columns: minmax(0, 1fr) 44px 52px;
       align-items: end;
       gap: 10px;
-      border: 1px solid #3a414d;
-      border-radius: 28px;
-      padding: 12px;
-      background: #22242b;
+      border: 1px solid var(--line-strong);
+      border-radius: 18px;
+      padding: 10px;
+      background: #ffffff;
       box-shadow: var(--shadow);
     }
 
     .composer textarea {
-      min-height: 56px;
+      min-height: 54px;
       max-height: 150px;
       resize: none;
       border: 0;
       outline: 0;
+      padding: 14px 6px 8px 8px;
       color: var(--text);
       background: transparent;
-      padding: 14px 6px 8px;
       line-height: 1.45;
     }
 
-    .composer textarea::placeholder { color: #9aa3b4; }
+    .composer textarea::placeholder { color: #8a96a8; }
 
-    .composer .icon-btn {
-      width: 48px;
-      height: 48px;
-      margin: 0;
-      border-radius: 50%;
-      background: #2b2f38;
+    .small-toggle, .send-btn {
+      height: 44px;
+      border: 0;
+      display: grid;
+      place-items: center;
+      transition: background 160ms ease, transform 160ms ease, opacity 160ms ease;
+    }
+
+    .small-toggle {
+      border-radius: 12px;
+      color: var(--muted);
+      background: var(--surface-soft);
+    }
+
+    .small-toggle.active {
+      color: var(--accent-strong);
+      background: var(--accent-soft);
     }
 
     .send-btn {
-      width: 56px;
-      height: 56px;
-      border: 0;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      color: #12151b;
-      background: #e7ebf2;
-      transition: transform 160ms ease, background 160ms ease, opacity 160ms ease;
+      width: 52px;
+      border-radius: 14px;
+      color: #ffffff;
+      background: var(--accent);
     }
 
-    .send-btn:hover { transform: translateY(-1px); background: #fff; }
+    .send-btn:hover { background: var(--accent-strong); transform: translateY(-1px); }
     .send-btn:disabled { cursor: not-allowed; opacity: 0.55; transform: none; }
 
-    .source-drawer {
-      width: 100%;
-      display: grid;
-      grid-template-rows: auto minmax(0, 1fr);
-      overflow: hidden;
-      background: #0e1116;
-    }
-
-    .drawer-head {
-      padding: 18px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .drawer-head h2 { margin: 0 0 4px; font-size: 1rem; }
-    .drawer-head p { margin: 0; color: var(--muted); font-size: 0.86rem; line-height: 1.4; }
-
-    .drawer-body {
-      min-height: 0;
-      overflow: auto;
-      padding: 14px;
-    }
-
-    .evidence-card {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px;
-      margin-bottom: 10px;
-      background: #151920;
-    }
-
-    .evidence-card strong { display: block; margin-bottom: 4px; }
-    .evidence-card p { margin: 0; color: var(--muted); line-height: 1.4; font-size: 0.84rem; }
-
-    .trace-box {
-      max-height: 320px;
-      overflow: auto;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px;
-      background: #080a0e;
-      color: #d8dee9;
-      font-size: 0.74rem;
-      line-height: 1.45;
-      white-space: pre-wrap;
-    }
-
-    .drawer-section-title {
-      margin: 18px 4px 10px;
-      color: var(--muted);
-      font-size: 0.76rem;
-      font-weight: 900;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .empty-note {
-      border: 1px dashed var(--line-strong);
-      border-radius: 14px;
-      padding: 14px;
-      color: var(--muted);
-      line-height: 1.45;
+    .icon {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     .spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.24);
-      border-top-color: #fff;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.34);
+      border-top-color: #ffffff;
       border-radius: 50%;
       animation: spin 850ms linear infinite;
-      vertical-align: -3px;
-      margin-right: 8px;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    @media (max-width: 1180px) {
-      .workspace { grid-template-columns: minmax(0, 1fr); }
-      .source-drawer { display: none; }
-      .source-drawer.open { display: grid; min-height: 360px; }
-    }
-
-    @media (max-width: 820px) {
+    @media (max-width: 860px) {
       body { overflow: auto; }
       .app-shell { min-height: 100dvh; height: auto; grid-template-columns: 1fr; }
       .sidebar { display: none; }
-      .workspace { min-height: 100dvh; padding: 10px; }
-      .chat-panel { min-height: calc(100dvh - 20px); border-radius: 16px; }
-      .topbar { min-height: auto; flex-wrap: wrap; padding: 12px; }
-      .modes, .status-pill { display: none; }
-      .message-list { padding: 18px 14px; }
-      .hero-state { justify-content: flex-start; padding-top: 10vh; }
-      .sample-row { grid-template-columns: 1fr; }
-      .composer-wrap { padding: 10px 12px 14px; }
-      .composer { grid-template-columns: minmax(0, 1fr) 52px; border-radius: 22px; }
-      .composer .icon-btn { display: none; }
+      .main { min-height: 100dvh; }
+      .topbar { align-items: flex-start; flex-direction: column; padding: 14px 18px; }
+      .status-row { justify-content: flex-start; }
+      .message-list { padding: 22px 14px; }
+      .hero-state { justify-content: flex-start; padding-top: 8vh; }
+      .quick-grid { grid-template-columns: 1fr; }
+      .composer-wrap { padding: 12px 12px 16px; }
+      .composer { grid-template-columns: minmax(0, 1fr) 48px; border-radius: 16px; }
+      .small-toggle { display: none; }
     }
   </style>
 </head>
 <body>
-  <div class="app-shell">
+  <div class="app-shell" id="appShell">
     <aside class="sidebar" aria-label="BankOps navigation">
-      <div class="side-head">
-        <div class="logo" aria-hidden="true">B</div>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">B</div>
         <div>
-          <p class="brand-title">BANKOPS</p>
-          <p class="brand-subtitle">AI Assistant</p>
+          <h1>BankOps Assistant</h1>
+          <p>Banking operations RAG</p>
         </div>
-        <button class="icon-btn" type="button" id="collapseSidebar" aria-label="Collapse sidebar">
-          <svg viewBox="0 0 24 24" class="icon"><path d="M15 18 9 12l6-6"/><path d="M20 4v16"/><path d="M4 4v16"/></svg>
-        </button>
       </div>
 
       <button class="new-chat" type="button" id="newChatButton">
-        <span class="source-row"><svg viewBox="0 0 24 24" class="icon"><path d="M12 5v14"/><path d="M5 12h14"/></svg>New Chat</span>
-        <span class="kbd">Ctrl K</span>
+        <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        New chat
       </button>
 
-      <div class="history" aria-label="Conversation history">
-        <p class="history-title">Recent questions</p>
-        <button class="history-item" type="button">UPI fraud after 5 working days</button>
-        <button class="history-item" type="button">Beneficial owner not verified</button>
-        <button class="history-item" type="button">Card complaint unresolved 90 days</button>
-        <button class="history-item" type="button">High risk PEP onboarding</button>
-        <button class="history-item" type="button">Individual KYC checks</button>
+      <div class="sidebar-section">
+        <p class="section-label">Suggested prompts</p>
+        <div class="prompt-list">
+          <button class="prompt-button" type="button" data-prompt="Customer reported an unauthorized UPI transaction 5 working days after the SMS alert. What should the operations agent do?">UPI fraud after 5 working days</button>
+          <button class="prompt-button" type="button" data-prompt="Can we open a company account if beneficial owner details are not verified?">Beneficial owner not verified</button>
+          <button class="prompt-button" type="button" data-prompt="A card fraud complaint is unresolved after 90 days. What is the next action?">Card complaint unresolved for 90 days</button>
+          <button class="prompt-button" type="button" data-prompt="A customer is marked politically exposed and wants onboarding. What should be checked?">High-risk customer onboarding</button>
+        </div>
       </div>
 
-      <div class="tools">
-        <p class="tool-title">Tools</p>
-        <button class="tool-btn" type="button" id="refreshKbButton"><svg viewBox="0 0 24 24" class="icon"><path d="M21 12a9 9 0 0 0-15.5-6.3"/><path d="M3 4v6h6"/><path d="M3 12a9 9 0 0 0 15.5 6.3"/><path d="M21 20v-6h-6"/></svg>Refresh KB Index</button>
-        <button class="tool-btn" type="button" id="toggleSourcesButton"><svg viewBox="0 0 24 24" class="icon"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="18" r="2"/></svg>View Retrieval Trace</button>
-        <button class="tool-btn" type="button" id="kbSearchButton"><svg viewBox="0 0 24 24" class="icon"><path d="m21 21-4.3-4.3"/><circle cx="11" cy="11" r="7"/></svg>KB Search</button>
-        <button class="tool-btn" type="button"><svg viewBox="0 0 24 24" class="icon"><path d="M12 3.2 19 6v5.7c0 4.2-2.8 7.9-7 9.1-4.2-1.2-7-4.9-7-9.1V6l7-2.8Z"/><path d="m8.8 12 2.1 2.1 4.5-4.7"/></svg>FlowProof Ready</button>
-      </div>
-
-      <div class="profile">
-        <div class="avatar" aria-hidden="true">NK</div>
-        <div>
-          <strong>Nikhil K</strong>
-          <span>RAG based assistant</span>
+      <div class="sidebar-note">
+        <div class="safety-box">
+          Demo data is synthetic and based on public RBI-style policy summaries. No confidential data is used.
         </div>
       </div>
     </aside>
 
-    <main class="workspace">
-      <section class="chat-panel" aria-label="BankOps chat assistant">
-        <header class="topbar">
-          <div class="title-lockup">
-            <div class="logo" aria-hidden="true">B</div>
-            <div>
-              <h1>BankOps</h1>
-              <p>Indian banking operations assistant</p>
-            </div>
-          </div>
-          <div class="actions source-row">
-            <div class="modes" aria-label="Assistant modes">
-              <button class="mode-btn active" type="button" id="assistantMode">Assistant Mode</button>
-              <button class="mode-btn" type="button" id="kbMode">KB Search</button>
-            </div>
-            <span class="status-pill" id="kbStatus">8 KBs indexed</span>
-            <span class="status-pill" id="apiStatus">Offline fallback ready</span>
-          </div>
-        </header>
-
-        <div class="message-list" id="messageList" aria-live="polite">
-          <div class="hero-state" id="heroState">
-            <div>
-              <h2>BankOps</h2>
-              <p>Ask banking operations questions and get source-backed answers from synthetic RBI-based KBs. Use this as the target assistant that FlowProof evaluates.</p>
-            </div>
-            <div class="sample-row" aria-label="Suggested prompts">
-              <button class="sample-card" type="button" data-prompt="Customer reported an unauthorized UPI transaction 5 working days after the SMS alert. What should the bank operations agent do?">
-                <small>UPI</small>
-                <strong>Unauthorized transaction</strong>
-                <span>Classify customer liability and next action.</span>
-              </button>
-              <button class="sample-card" type="button" data-prompt="Can we open a company account if beneficial owner is not verified?">
-                <small>KYC</small>
-                <strong>Beneficial owner</strong>
-                <span>Check business account activation guardrails.</span>
-              </button>
-              <button class="sample-card" type="button" data-prompt="A card fraud complaint is unresolved after 90 days. What is the next action?">
-                <small>SLA</small>
-                <strong>90-day complaint</strong>
-                <span>Find escalation and compensation handling.</span>
-              </button>
-            </div>
-          </div>
+    <main class="main" aria-label="BankOps chat">
+      <header class="topbar">
+        <div class="topbar-title">
+          <h2>BankOps Assistant</h2>
+          <p>Ask a banking operations question and get a grounded answer with sources.</p>
         </div>
+        <div class="status-row">
+          <span class="status-pill" id="dataStatus">Synthetic data only</span>
+          <span class="status-pill" id="apiStatus">Ready</span>
+        </div>
+      </header>
 
-        <div class="composer-wrap">
-          <form class="composer" id="composer">
-            <button class="icon-btn" type="button" id="attachButton" aria-label="Attach context">
-              <svg viewBox="0 0 24 24" class="icon"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+      <section class="message-list" id="messageList" aria-live="polite">
+        <div class="hero-state" id="heroState">
+          <div>
+            <h3>BankOps</h3>
+            <p>Use this assistant for banking operations questions around unauthorized transactions, complaint timelines, KYC checks, and high-risk customer handling.</p>
+          </div>
+          <div class="quick-grid" aria-label="Quick prompts">
+            <button class="quick-card" type="button" data-prompt="Customer reported an unauthorized UPI transaction 5 working days after the SMS alert. What should the operations agent do?">
+              <small>Transaction Ops</small>
+              <strong>Unauthorized UPI case</strong>
+              <span>Classify liability window and safe next action.</span>
             </button>
-            <textarea id="questionInput" rows="1" placeholder="Ask BankOps anything..." aria-label="Ask BankOps anything"></textarea>
-            <button class="icon-btn" type="button" id="webToggleButton" aria-label="Toggle public web verification" title="Toggle public web verification">
-              <svg viewBox="0 0 24 24" class="icon"><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0Z"/><path d="M3.6 9h16.8"/><path d="M3.6 15h16.8"/><path d="M12 3a15.3 15.3 0 0 1 0 18"/><path d="M12 3a15.3 15.3 0 0 0 0 18"/></svg>
+            <button class="quick-card" type="button" data-prompt="Can we open a company account if beneficial owner details are not verified?">
+              <small>KYC</small>
+              <strong>Beneficial owner missing</strong>
+              <span>Check account activation guardrails.</span>
             </button>
-            <button class="send-btn" id="sendButton" type="submit" aria-label="Send question">
-              <svg viewBox="0 0 24 24" class="icon"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+            <button class="quick-card" type="button" data-prompt="A card fraud complaint is unresolved after 90 days. What is the next action?">
+              <small>Complaint SLA</small>
+              <strong>90-day unresolved case</strong>
+              <span>Find escalation and customer handling path.</span>
             </button>
-          </form>
+          </div>
         </div>
       </section>
 
-      <aside class="source-drawer" id="sourceDrawer" aria-label="Retrieval evidence and trace">
-        <div class="drawer-head">
-          <h2>Retrieval Evidence</h2>
-          <p>Technical details for FlowProof: citations, retrieved KB chunks, risk, confidence, and trace JSON.</p>
-        </div>
-        <div class="drawer-body">
-          <div class="empty-note" id="sourceEmpty">Ask a question to populate citations and retrieval trace.</div>
-          <div id="sourceList"></div>
-          <p class="drawer-section-title">Trace JSON</p>
-          <pre class="trace-box" id="traceJson">{}</pre>
-        </div>
-      </aside>
+      <div class="composer-wrap">
+        <form class="composer" id="composer">
+          <textarea id="messageInput" rows="1" placeholder="Ask BankOps anything..." aria-label="Ask BankOps anything"></textarea>
+          <button class="small-toggle" type="button" id="webToggleButton" aria-label="Toggle public web verification" title="Public web verification">
+            <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0Z"/><path d="M3.6 9h16.8"/><path d="M3.6 15h16.8"/><path d="M12 3a15.3 15.3 0 0 1 0 18"/><path d="M12 3a15.3 15.3 0 0 0 0 18"/></svg>
+          </button>
+          <button class="send-btn" id="sendButton" type="submit" aria-label="Send question">
+            <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+          </button>
+        </form>
+      </div>
     </main>
   </div>
+
+  <template id="sourceChipTemplate"><span class="source-chip"></span></template>
 
   <script>
     const messageList = document.getElementById("messageList");
     const heroState = document.getElementById("heroState");
     const composer = document.getElementById("composer");
-    const questionInput = document.getElementById("questionInput");
+    const messageInput = document.getElementById("messageInput");
     const sendButton = document.getElementById("sendButton");
-    const sourceDrawer = document.getElementById("sourceDrawer");
-    const sourceList = document.getElementById("sourceList");
-    const sourceEmpty = document.getElementById("sourceEmpty");
-    const traceJson = document.getElementById("traceJson");
-    const apiStatus = document.getElementById("apiStatus");
-    const kbStatus = document.getElementById("kbStatus");
     const webToggleButton = document.getElementById("webToggleButton");
-    const toggleSourcesButton = document.getElementById("toggleSourcesButton");
+    const apiStatus = document.getElementById("apiStatus");
     const newChatButton = document.getElementById("newChatButton");
-    const refreshKbButton = document.getElementById("refreshKbButton");
-    const kbMode = document.getElementById("kbMode");
-    const assistantMode = document.getElementById("assistantMode");
 
-    let kbItems = [];
+    let kbById = {};
     let useWeb = false;
-    let lastTrace = null;
 
-    async function loadKb() {
-      const response = await fetch("/api/kb");
-      const data = await response.json();
-      kbItems = data.kb || [];
-      kbStatus.textContent = `${kbItems.length} KBs indexed`;
-      renderSourcesFromKb(kbItems.slice(0, 4), { question: "KB index preview" });
+    function escapeHtml(value) {
+      return String(value == null ? "" : value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[char]));
     }
 
-    function addMessage(role, text, meta = {}) {
+    function inlineMarkdown(value) {
+      return escapeHtml(value)
+        .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+        .replace(/`([^`]+)`/g, "<code>$1</code>");
+    }
+
+    function renderMarkdown(markdown) {
+      const lines = String(markdown || "").replace(/\r\n/g, "\n").split("\n");
+      let html = "";
+      let listType = null;
+      let paragraph = [];
+
+      function flushParagraph() {
+        if (!paragraph.length) return;
+        html += `<p>${inlineMarkdown(paragraph.join(" "))}</p>`;
+        paragraph = [];
+      }
+
+      function closeList() {
+        if (!listType) return;
+        html += `</${listType}>`;
+        listType = null;
+      }
+
+      for (const rawLine of lines) {
+        const line = rawLine.trim();
+        if (!line) {
+          flushParagraph();
+          closeList();
+          continue;
+        }
+
+        const heading = line.match(/^#{1,3}\s+(.+)$/);
+        if (heading) {
+          flushParagraph();
+          closeList();
+          html += `<h3>${inlineMarkdown(heading[1])}</h3>`;
+          continue;
+        }
+
+        const bullet = line.match(/^-\s+(.+)$/);
+        if (bullet) {
+          flushParagraph();
+          if (listType !== "ul") {
+            closeList();
+            listType = "ul";
+            html += "<ul>";
+          }
+          html += `<li>${inlineMarkdown(bullet[1])}</li>`;
+          continue;
+        }
+
+        const numbered = line.match(/^\d+\.\s+(.+)$/);
+        if (numbered) {
+          flushParagraph();
+          if (listType !== "ol") {
+            closeList();
+            listType = "ol";
+            html += "<ol>";
+          }
+          html += `<li>${inlineMarkdown(numbered[1])}</li>`;
+          continue;
+        }
+
+        closeList();
+        paragraph.push(line);
+      }
+
+      flushParagraph();
+      closeList();
+      return html || "<p>No answer returned.</p>";
+    }
+
+    async function loadKbMetadata() {
+      try {
+        const response = await fetch("/api/kb");
+        const data = await response.json();
+        kbById = Object.fromEntries((data.kb || []).map((item) => [item.id, item]));
+      } catch (_error) {
+        kbById = {};
+      }
+    }
+
+    function createMessage(role, text) {
       heroState.style.display = "none";
       const row = document.createElement("article");
       row.className = `message ${role}`;
 
       const avatar = document.createElement("div");
-      avatar.className = "avatar";
-      avatar.textContent = role === "user" ? "NK" : "B";
+      avatar.className = "message-avatar";
+      avatar.textContent = role === "user" ? "You" : "B";
 
-      const bubble = document.createElement("div");
-      bubble.className = "bubble";
-      bubble.textContent = text;
-
-      if (meta.citations && meta.citations.length) {
-        const metaRow = document.createElement("div");
-        metaRow.className = "bubble-meta";
-        meta.citations.forEach((citation) => {
-          const pill = document.createElement("span");
-          pill.className = "mini-pill";
-          pill.textContent = citation;
-          metaRow.appendChild(pill);
-        });
-        if (meta.risk) {
-          const risk = document.createElement("span");
-          risk.className = "mini-pill";
-          risk.textContent = `Risk: ${meta.risk}`;
-          metaRow.appendChild(risk);
-        }
-        bubble.appendChild(metaRow);
+      const body = document.createElement("div");
+      body.className = "message-body";
+      if (role === "assistant") {
+        body.innerHTML = renderMarkdown(text);
+      } else {
+        body.textContent = text;
       }
 
       row.appendChild(avatar);
-      row.appendChild(bubble);
+      row.appendChild(body);
       messageList.appendChild(row);
       messageList.scrollTop = messageList.scrollHeight;
-      return bubble;
+      return body;
     }
 
-    function renderSourcesFromKb(items, trace) {
-      sourceEmpty.style.display = items.length ? "none" : "block";
-      sourceList.innerHTML = items.map((item) => `
-        <article class="evidence-card">
-          <span class="mini-pill">${escapeHtml(item.id)}</span>
-          <strong>${escapeHtml(item.title || "KB passage")}</strong>
-          <p>${escapeHtml(item.text || item.source_url || "Retrieved evidence")}</p>
-        </article>
-      `).join("");
-      traceJson.textContent = JSON.stringify(trace || {}, null, 2);
-    }
+    function appendSources(body, data) {
+      const citations = Array.isArray(data.citations) ? data.citations : [];
+      const hasMeta = data.risk || data.confidence || citations.length;
+      if (!hasMeta) return;
 
-    function renderResponseSources(data) {
-      const retrieved = data.trace && Array.isArray(data.trace.retrieved) ? data.trace.retrieved : [];
-      const enriched = retrieved.map((item) => {
-        const match = kbItems.find((kb) => kb.id === item.id);
-        return { ...item, text: match ? match.text : item.source_url };
+      const list = document.createElement("div");
+      list.className = "source-list";
+
+      citations.forEach((id) => {
+        const source = kbById[id] || {};
+        const chip = source.source_url ? document.createElement("a") : document.createElement("span");
+        chip.className = "source-chip";
+        chip.textContent = source.title ? `${id}: ${source.title}` : id;
+        if (source.source_url) {
+          chip.href = source.source_url;
+          chip.target = "_blank";
+          chip.rel = "noopener noreferrer";
+        }
+        list.appendChild(chip);
       });
-      renderSourcesFromKb(enriched, data.trace || data);
-      lastTrace = data.trace || data;
+
+      [data.risk && `Risk: ${data.risk}`, data.confidence && `Confidence: ${data.confidence}`]
+        .filter(Boolean)
+        .forEach((label) => {
+          const chip = document.createElement("span");
+          chip.className = "source-chip neutral";
+          chip.textContent = label;
+          list.appendChild(chip);
+        });
+
+      if (data.next_action) {
+        const chip = document.createElement("span");
+        chip.className = "source-chip neutral";
+        chip.textContent = `Next action: ${data.next_action}`;
+        list.appendChild(chip);
+      }
+
+      body.appendChild(list);
     }
 
-    async function askQuestion(prompt) {
-      const cleanPrompt = prompt.trim();
-      if (!cleanPrompt) return;
+    async function ask(prompt) {
+      const question = prompt.trim();
+      if (!question) return;
 
-      addMessage("user", cleanPrompt);
-      const pending = addMessage("assistant", "Retrieving grounded KB context...");
+      createMessage("user", question);
+      const assistantBody = createMessage("assistant", "Retrieving source-backed context...");
       sendButton.disabled = true;
       sendButton.innerHTML = '<span class="spinner" aria-hidden="true"></span>';
 
@@ -785,102 +772,58 @@
         const response = await fetch("/api/ask", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question: cleanPrompt, useWeb })
+          body: JSON.stringify({ question, useWeb })
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "Request failed");
-        pending.textContent = data.answer || "No answer returned.";
-        const metaRow = document.createElement("div");
-        metaRow.className = "bubble-meta";
-        (data.citations || []).forEach((citation) => {
-          const pill = document.createElement("span");
-          pill.className = "mini-pill";
-          pill.textContent = citation;
-          metaRow.appendChild(pill);
-        });
-        [data.risk && `Risk: ${data.risk}`, data.confidence && `Confidence: ${data.confidence}`, data.mode].filter(Boolean).forEach((label) => {
-          const pill = document.createElement("span");
-          pill.className = "mini-pill";
-          pill.textContent = label;
-          metaRow.appendChild(pill);
-        });
-        pending.appendChild(metaRow);
-        if (data.next_action) {
-          const next = document.createElement("p");
-          next.style.margin = "12px 0 0";
-          next.style.color = "var(--soft)";
-          next.textContent = `Next action: ${data.next_action}`;
-          pending.appendChild(next);
-        }
+        assistantBody.innerHTML = renderMarkdown(data.answer || "No answer returned.");
+        appendSources(assistantBody, data);
         apiStatus.textContent = data.api_status || data.mode || "Answer ready";
-        renderResponseSources(data);
       } catch (error) {
-        pending.textContent = error.message;
+        assistantBody.innerHTML = renderMarkdown(`### Request failed\n- ${error.message}`);
         apiStatus.textContent = "Request failed";
       } finally {
         sendButton.disabled = false;
-        sendButton.innerHTML = '<svg viewBox="0 0 24 24" class="icon"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>';
+        sendButton.innerHTML = '<svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>';
       }
     }
 
     function resetChat() {
       messageList.querySelectorAll(".message").forEach((node) => node.remove());
       heroState.style.display = "flex";
-      questionInput.value = "";
-      questionInput.focus();
-    }
-
-    function escapeHtml(value) {
-      return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+      messageInput.value = "";
+      messageInput.focus();
+      apiStatus.textContent = useWeb ? "Public web check on" : "Ready";
     }
 
     composer.addEventListener("submit", (event) => {
       event.preventDefault();
-      const prompt = questionInput.value;
-      questionInput.value = "";
-      askQuestion(prompt);
+      const prompt = messageInput.value;
+      messageInput.value = "";
+      ask(prompt);
     });
 
-    questionInput.addEventListener("keydown", (event) => {
+    messageInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
         composer.requestSubmit();
       }
     });
 
-    document.querySelectorAll(".sample-card, .history-item").forEach((button) => {
+    document.querySelectorAll("[data-prompt]").forEach((button) => {
       button.addEventListener("click", () => {
-        const prompt = button.dataset.prompt || button.textContent.trim();
-        questionInput.value = prompt;
-        questionInput.focus();
+        messageInput.value = button.dataset.prompt || "";
+        messageInput.focus();
       });
     });
 
     webToggleButton.addEventListener("click", () => {
       useWeb = !useWeb;
-      webToggleButton.style.background = useWeb ? "rgba(14, 165, 160, 0.22)" : "#2b2f38";
-      apiStatus.textContent = useWeb ? "Public web verification on" : "Offline fallback ready";
+      webToggleButton.classList.toggle("active", useWeb);
+      apiStatus.textContent = useWeb ? "Public web check on" : "Ready";
     });
 
-    toggleSourcesButton.addEventListener("click", () => {
-      sourceDrawer.classList.toggle("open");
-      if (lastTrace) traceJson.textContent = JSON.stringify(lastTrace, null, 2);
-    });
-
-    refreshKbButton.addEventListener("click", loadKb);
     newChatButton.addEventListener("click", resetChat);
-
-    kbMode.addEventListener("click", () => {
-      kbMode.classList.add("active");
-      assistantMode.classList.remove("active");
-      sourceDrawer.classList.add("open");
-      renderSourcesFromKb(kbItems, { mode: "KB Search", kb_count: kbItems.length });
-    });
-
-    assistantMode.addEventListener("click", () => {
-      assistantMode.classList.add("active");
-      kbMode.classList.remove("active");
-    });
 
     document.addEventListener("keydown", (event) => {
       if (event.ctrlKey && event.key.toLowerCase() === "k") {
@@ -889,8 +832,7 @@
       }
     });
 
-    loadKb();
+    loadKbMetadata();
   </script>
 </body>
 </html>
-

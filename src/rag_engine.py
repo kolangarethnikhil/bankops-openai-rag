@@ -71,6 +71,7 @@ Rules:
 - Do not invent policy, amounts, timelines, or bank-specific rules.
 - If context is insufficient, say escalation to a human policy owner is required.
 - Cite KB IDs in every answer.
+- Write the answer field in concise markdown with short headings and bullet points when useful.
 - Return JSON with keys: answer, citations, risk, next_action, confidence, public_web_notes.
 
 {web_instruction}
@@ -89,11 +90,17 @@ def _risk_from_passages(passages):
 
 
 def offline_answer(question, passages):
-    """Return a deterministic answer when OpenAI is not configured."""
+    """Return a deterministic markdown answer when OpenAI is not configured."""
     if not passages:
         return {
             "mode": "offline_fallback",
-            "answer": "I do not have enough grounded synthetic KB context to answer. Escalate to a human banking policy owner.",
+            "answer": (
+                "### Recommended action\n"
+                "- I do not have enough grounded synthetic policy context to answer this safely.\n"
+                "- Escalate to a human banking policy owner before advising the customer.\n"
+                "\n### Why\n"
+                "- Banking operations answers need a cited policy source for timelines, liability, or KYC decisions."
+            ),
             "citations": [],
             "risk": "High",
             "next_action": "Escalate to human review",
@@ -102,19 +109,43 @@ def offline_answer(question, passages):
         }
 
     citations = [item["id"] for item in passages]
-    top_text = " ".join(item["text"] for item in passages[:3])
     if "RBI-UT-002" in citations:
         next_action = "Register complaint, classify reporting timeline, avoid final reimbursement promises, and escalate if unresolved or high risk."
+        answer_points = [
+            "Register the complaint immediately and capture transaction date, reporting date, channel, amount, and customer contact.",
+            "Classify the liability window using the reporting timeline: within 3 working days, 4 to 7 working days, or beyond 7 working days.",
+            "Do not promise final reimbursement until investigation and policy checks are complete.",
+            "Escalate if the case is unresolved, high risk, or requires compliance review.",
+        ]
     elif "RBI-KYC-003" in citations:
         next_action = "Pause activation until beneficial owner and authorized signatory evidence is verified."
+        answer_points = [
+            "Do not activate the business account while beneficial owner evidence is incomplete.",
+            "Verify ownership, control, and authorized signatory details from acceptable documents.",
+            "Escalate to KYC or compliance review if ownership remains unclear.",
+        ]
     elif "RBI-KYC-004" in citations:
         next_action = "Route to enhanced due diligence and senior approval workflow."
+        answer_points = [
+            "Treat the case as higher risk and apply enhanced due diligence.",
+            "Collect additional context such as customer profile, source of funds, and transaction purpose where required.",
+            "Proceed only after the appropriate senior or compliance approval is recorded.",
+        ]
     else:
-        next_action = "Follow the cited KB steps and escalate if evidence is incomplete."
+        next_action = "Follow the cited source-backed steps and escalate if evidence is incomplete."
+        answer_points = [item["text"] for item in passages[:2]]
+
+    source_line = ", ".join(citations)
+    answer = (
+        "### Recommended action\n"
+        + "\n".join(f"- {point}" for point in answer_points)
+        + "\n\n### Sources used\n"
+        + f"- {source_line}"
+    )
 
     return {
         "mode": "offline_fallback",
-        "answer": f"Offline fallback answer from synthetic public-source KB: {top_text}",
+        "answer": answer,
         "citations": citations,
         "risk": _risk_from_passages(passages),
         "next_action": next_action,

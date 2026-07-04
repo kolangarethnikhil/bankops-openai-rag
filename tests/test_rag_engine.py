@@ -30,13 +30,17 @@ class RagEngineTests(unittest.TestCase):
         self.assertIn("Do not invent policy", prompt)
         self.assertIn("RBI-UT-001", prompt)
         self.assertIn("Return JSON", prompt)
+        self.assertIn("markdown", prompt.lower())
 
-    def test_offline_answer_returns_trace(self):
+    def test_offline_answer_is_markdown_but_trace_stays_backend_payload(self):
         passages = retrieve("card fraud complaint unresolved for 90 days", top_k=3)
         result = offline_answer("card fraud complaint unresolved for 90 days", passages)
         self.assertEqual(result["mode"], "offline_fallback")
         self.assertTrue(result["citations"])
         self.assertIn("retrieved", result["trace"])
+        self.assertIn("### Recommended action", result["answer"])
+        self.assertIn("- ", result["answer"])
+        self.assertNotIn("Offline fallback answer", result["answer"])
 
 
 if __name__ == "__main__":
