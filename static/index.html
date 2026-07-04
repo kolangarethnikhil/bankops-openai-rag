@@ -1,210 +1,896 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BankOps OpenAI RAG Assistant</title>
+  <title>BankOps Assistant</title>
   <style>
     :root {
-      --bg: #f5f8fb;
-      --surface: #ffffff;
-      --ink: #0f172a;
-      --muted: #526071;
-      --border: #d7e1ea;
-      --primary: #0f766e;
-      --primary-dark: #115e59;
-      --danger: #b91c1c;
-      --warning: #b45309;
-      --info: #0369a1;
-      --shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+      --bg: #080a0e;
+      --rail: #101318;
+      --rail-2: #151920;
+      --panel: #0b0d11;
+      --panel-2: #1c2028;
+      --line: #242a34;
+      --line-strong: #333a46;
+      --text: #f4f6fb;
+      --muted: #969eac;
+      --soft: #c7ced9;
+      --accent: #0ea5a0;
+      --accent-2: #7c9cff;
+      --danger: #f87171;
+      --warning: #fbbf24;
+      --success: #34d399;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
     }
+
     * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
       margin: 0;
       min-width: 320px;
-      font-family: Arial, Helvetica, sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at 85% 0%, rgba(3, 105, 161, 0.16), transparent 23rem),
-        linear-gradient(135deg, rgba(15, 118, 110, 0.12), transparent 34rem),
-        var(--bg);
+      overflow: hidden;
+      color: var(--text);
+      background: var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
     }
+
     button, textarea, input { font: inherit; }
+    button { cursor: pointer; }
     button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus-visible {
-      outline: 3px solid rgba(15, 118, 110, 0.28);
+      outline: 3px solid rgba(14, 165, 160, 0.35);
       outline-offset: 2px;
     }
-    .shell { width: min(1500px, calc(100% - 36px)); margin: 0 auto; padding: 24px 0 36px; }
-    .top { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 18px; }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .mark { width: 52px; height: 52px; border-radius: 8px; background: var(--primary); display: grid; place-items: center; color: white; box-shadow: var(--shadow); }
-    .icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-    h1, h2, h3, p { margin-top: 0; }
-    h1 { margin-bottom: 2px; font-size: clamp(1.55rem, 3vw, 2.35rem); letter-spacing: 0; line-height: 1.05; }
-    h2 { margin-bottom: 0; font-size: 1.12rem; }
-    h3 { margin-bottom: 8px; font-size: 1rem; }
-    .eyebrow { margin: 0; color: var(--muted); font-size: 0.76rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
-    .actions, .chips, .source-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-    .pill { display: inline-flex; align-items: center; min-height: 30px; padding: 5px 10px; border: 1px solid var(--border); border-radius: 999px; background: white; color: var(--muted); font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
-    .pill.info { border-color: rgba(3, 105, 161, 0.2); background: #eff6ff; color: var(--info); }
-    .pill.warn { border-color: rgba(180, 83, 9, 0.24); background: #fffbeb; color: var(--warning); }
-    .grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 16px; }
-    .panel, .kb-card { border: 1px solid var(--border); border-radius: 8px; background: rgba(255, 255, 255, 0.94); box-shadow: var(--shadow); }
-    .panel { padding: 18px; }
-    label { display: block; margin: 16px 0 8px; font-weight: 700; }
-    textarea { width: 100%; min-height: 178px; resize: vertical; border: 1px solid var(--border); border-radius: 8px; padding: 12px; line-height: 1.5; color: var(--ink); background: #fbfdff; }
-    .check { display: flex; gap: 9px; align-items: flex-start; margin: 12px 0; color: var(--muted); line-height: 1.4; }
-    .check input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--primary); }
-    .btn { width: 100%; min-height: 48px; border: 0; border-radius: 8px; padding: 12px 16px; color: white; background: var(--primary); font-weight: 700; cursor: pointer; }
-    .btn:hover { background: var(--primary-dark); }
-    .samples { display: grid; gap: 8px; margin-top: 16px; }
-    .sample { border: 1px solid var(--border); border-radius: 8px; padding: 10px; background: white; text-align: left; cursor: pointer; line-height: 1.35; }
-    .answer { min-height: 380px; border-left: 4px solid var(--primary); border-radius: 8px; padding: 16px; background: #f8fafc; line-height: 1.6; white-space: pre-wrap; }
-    .meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 12px; }
-    .metric { border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: white; }
-    .metric span { display: block; margin-bottom: 6px; color: var(--muted); font-size: 0.74rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
-    .metric strong { color: var(--primary-dark); }
-    .kb { margin-top: 16px; }
-    .kb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 10px; }
-    .kb-card { padding: 14px; }
-    .kb-card p { color: var(--muted); line-height: 1.45; }
-    .tag { display: inline-flex; min-height: 24px; align-items: center; border-radius: 999px; padding: 3px 8px; background: #eef2f7; color: #334155; font-size: 0.72rem; font-weight: 700; }
-    details { margin-top: 12px; }
-    summary { color: var(--primary-dark); font-weight: 700; cursor: pointer; }
-    pre { overflow: auto; max-height: 280px; border-radius: 8px; padding: 12px; background: #0f172a; color: #e2e8f0; font-size: 0.78rem; line-height: 1.45; }
-    .muted { color: var(--muted); line-height: 1.5; }
-    @media (max-width: 1120px) { .grid, .kb-grid { grid-template-columns: 1fr; } .meta { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 720px) { .shell { width: min(100% - 24px, 1500px); } .top { align-items: flex-start; flex-direction: column; } .meta { grid-template-columns: 1fr; } }
+
+    .app-shell {
+      height: 100dvh;
+      display: grid;
+      grid-template-columns: 316px minmax(0, 1fr);
+      background: radial-gradient(circle at 68% 18%, rgba(14, 165, 160, 0.08), transparent 28rem), var(--bg);
+    }
+
+    .sidebar {
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--line);
+      background: linear-gradient(180deg, #12161c 0%, #0e1116 100%);
+    }
+
+    .side-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #303743, #545b67);
+      color: #fff;
+      font-weight: 800;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+    }
+
+    .brand-subtitle {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .icon-btn, .new-chat, .tool-btn, .sample-card, .mode-btn {
+      border: 1px solid var(--line);
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.03);
+      transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+    }
+
+    .icon-btn:hover, .new-chat:hover, .tool-btn:hover, .sample-card:hover, .mode-btn:hover {
+      border-color: var(--line-strong);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .icon-btn {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      margin-left: auto;
+      border-radius: 8px;
+    }
+
+    .icon {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .new-chat {
+      min-height: 58px;
+      margin: 16px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 14px;
+      font-weight: 800;
+      text-align: left;
+    }
+
+    .kbd {
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .history {
+      min-height: 0;
+      flex: 1;
+      overflow: auto;
+      padding: 0 16px 16px;
+    }
+
+    .history-title, .tool-title {
+      margin: 18px 8px 10px;
+      color: #7e8797;
+      font-size: 0.76rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .history-item {
+      width: 100%;
+      min-height: 42px;
+      border: 0;
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: transparent;
+      color: #d3d7df;
+      text-align: left;
+      font-weight: 700;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .history-item:hover { background: rgba(255, 255, 255, 0.04); }
+
+    .tools {
+      border-top: 1px solid var(--line);
+      padding: 12px 16px;
+    }
+
+    .tool-btn {
+      width: 100%;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-radius: 8px;
+      border-color: transparent;
+      background: transparent;
+      color: #d5dae4;
+      padding: 0 10px;
+      text-align: left;
+      font-weight: 800;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 8px 12px 14px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #353b46;
+      color: #fff;
+      font-weight: 900;
+    }
+
+    .profile strong { display: block; font-size: 0.9rem; }
+    .profile span { display: block; margin-top: 2px; color: var(--muted); font-size: 0.78rem; }
+
+    .workspace {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 14px;
+      padding: 14px 16px 16px 12px;
+    }
+
+    .chat-panel, .source-drawer {
+      min-height: 0;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(9, 11, 15, 0.92);
+      box-shadow: var(--shadow);
+    }
+
+    .chat-panel {
+      display: grid;
+      grid-template-rows: 70px minmax(0, 1fr) auto;
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 22px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .title-lockup { display: flex; align-items: center; gap: 12px; }
+    .title-lockup h1 { margin: 0; font-size: 1.02rem; letter-spacing: 0.16em; }
+    .title-lockup p { margin: 3px 0 0; color: var(--muted); font-size: 0.76rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+
+    .modes {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 4px;
+      background: #11151b;
+    }
+
+    .mode-btn {
+      min-height: 36px;
+      border-radius: 14px;
+      padding: 0 13px;
+      border: 0;
+      color: #aeb7c5;
+      font-weight: 800;
+      background: transparent;
+    }
+
+    .mode-btn.active { color: #fff; background: #242934; }
+
+    .status-pill {
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0 13px;
+      color: #cbd5e1;
+      background: #11151b;
+      font-size: 0.84rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .message-list {
+      min-height: 0;
+      overflow: auto;
+      padding: 28px 24px 22px;
+      scroll-behavior: smooth;
+    }
+
+    .hero-state {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 26px;
+      text-align: center;
+      padding-bottom: 10vh;
+    }
+
+    .hero-state h2 {
+      margin: 0;
+      font-size: clamp(3rem, 8vw, 5.6rem);
+      line-height: 0.95;
+      letter-spacing: 0;
+      font-weight: 900;
+    }
+
+    .hero-state p {
+      max-width: 670px;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.5vw, 1.18rem);
+      line-height: 1.55;
+    }
+
+    .sample-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      width: min(900px, 100%);
+    }
+
+    .sample-card {
+      min-height: 114px;
+      border-radius: 18px;
+      padding: 14px 16px;
+      text-align: left;
+    }
+
+    .sample-card small {
+      display: inline-flex;
+      margin-bottom: 12px;
+      border-radius: 999px;
+      padding: 5px 10px;
+      color: var(--soft);
+      background: rgba(255, 255, 255, 0.05);
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .sample-card strong { display: block; margin-bottom: 7px; font-size: 1rem; }
+    .sample-card span { color: var(--muted); line-height: 1.35; }
+
+    .message {
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
+      gap: 12px;
+      width: min(920px, 100%);
+      margin: 0 auto 18px;
+    }
+
+    .message.user { grid-template-columns: minmax(0, 1fr) 38px; }
+    .message.user .bubble { grid-column: 1; justify-self: end; background: #202530; border-color: #343c4a; }
+    .message.user .avatar { grid-column: 2; grid-row: 1; }
+
+    .bubble {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px 16px;
+      background: #141820;
+      color: #f3f6fb;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .bubble-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .mini-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: rgba(14, 165, 160, 0.12);
+      color: #8ee3df;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    .composer-wrap {
+      padding: 12px 24px 22px;
+      background: linear-gradient(180deg, transparent, rgba(8, 10, 14, 0.92) 28%);
+    }
+
+    .composer {
+      width: min(1180px, 100%);
+      min-height: 92px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr) 48px 56px;
+      align-items: end;
+      gap: 10px;
+      border: 1px solid #3a414d;
+      border-radius: 28px;
+      padding: 12px;
+      background: #22242b;
+      box-shadow: var(--shadow);
+    }
+
+    .composer textarea {
+      min-height: 56px;
+      max-height: 150px;
+      resize: none;
+      border: 0;
+      outline: 0;
+      color: var(--text);
+      background: transparent;
+      padding: 14px 6px 8px;
+      line-height: 1.45;
+    }
+
+    .composer textarea::placeholder { color: #9aa3b4; }
+
+    .composer .icon-btn {
+      width: 48px;
+      height: 48px;
+      margin: 0;
+      border-radius: 50%;
+      background: #2b2f38;
+    }
+
+    .send-btn {
+      width: 56px;
+      height: 56px;
+      border: 0;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #12151b;
+      background: #e7ebf2;
+      transition: transform 160ms ease, background 160ms ease, opacity 160ms ease;
+    }
+
+    .send-btn:hover { transform: translateY(-1px); background: #fff; }
+    .send-btn:disabled { cursor: not-allowed; opacity: 0.55; transform: none; }
+
+    .source-drawer {
+      width: 100%;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      overflow: hidden;
+      background: #0e1116;
+    }
+
+    .drawer-head {
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .drawer-head h2 { margin: 0 0 4px; font-size: 1rem; }
+    .drawer-head p { margin: 0; color: var(--muted); font-size: 0.86rem; line-height: 1.4; }
+
+    .drawer-body {
+      min-height: 0;
+      overflow: auto;
+      padding: 14px;
+    }
+
+    .evidence-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #151920;
+    }
+
+    .evidence-card strong { display: block; margin-bottom: 4px; }
+    .evidence-card p { margin: 0; color: var(--muted); line-height: 1.4; font-size: 0.84rem; }
+
+    .trace-box {
+      max-height: 320px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #080a0e;
+      color: #d8dee9;
+      font-size: 0.74rem;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+
+    .drawer-section-title {
+      margin: 18px 4px 10px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .empty-note {
+      border: 1px dashed var(--line-strong);
+      border-radius: 14px;
+      padding: 14px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.24);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 850ms linear infinite;
+      vertical-align: -3px;
+      margin-right: 8px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 1180px) {
+      .workspace { grid-template-columns: minmax(0, 1fr); }
+      .source-drawer { display: none; }
+      .source-drawer.open { display: grid; min-height: 360px; }
+    }
+
+    @media (max-width: 820px) {
+      body { overflow: auto; }
+      .app-shell { min-height: 100dvh; height: auto; grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .workspace { min-height: 100dvh; padding: 10px; }
+      .chat-panel { min-height: calc(100dvh - 20px); border-radius: 16px; }
+      .topbar { min-height: auto; flex-wrap: wrap; padding: 12px; }
+      .modes, .status-pill { display: none; }
+      .message-list { padding: 18px 14px; }
+      .hero-state { justify-content: flex-start; padding-top: 10vh; }
+      .sample-row { grid-template-columns: 1fr; }
+      .composer-wrap { padding: 10px 12px 14px; }
+      .composer { grid-template-columns: minmax(0, 1fr) 52px; border-radius: 22px; }
+      .composer .icon-btn { display: none; }
+    }
   </style>
 </head>
 <body>
-  <main class="shell">
-    <header class="top">
-      <div class="brand">
-        <div class="mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" class="icon"><path d="M4 19V5"/><path d="M8 19v-7"/><path d="M12 19V8"/><path d="M16 19v-4"/><path d="M20 19V9"/></svg>
-        </div>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="BankOps navigation">
+      <div class="side-head">
+        <div class="logo" aria-hidden="true">B</div>
         <div>
-          <p class="eyebrow">Synthetic Indian BankOps RAG</p>
-          <h1>BankOps OpenAI RAG Assistant</h1>
+          <p class="brand-title">BANKOPS</p>
+          <p class="brand-subtitle">AI Assistant</p>
         </div>
-      </div>
-      <div class="actions">
-        <span class="pill info">Server-side OpenAI API</span>
-        <span class="pill info">RBI-source synthetic KB</span>
-        <span class="pill warn">No client data</span>
-      </div>
-    </header>
-
-    <section class="grid">
-      <div class="panel">
-        <p class="eyebrow">Ask a banking operations question</p>
-        <h2>RAG Query Console</h2>
-        <label for="question">Question</label>
-        <textarea id="question">Customer reported an unauthorized UPI transaction 5 working days after the SMS alert. What should the bank operations agent do?</textarea>
-        <label class="check">
-          <input type="checkbox" id="useWeb" />
-          <span>Enable public web verification through OpenAI hosted web search. Use this only for public RBI/NPCI-style checks.</span>
-        </label>
-        <button class="btn" id="ask">Run grounded answer</button>
-        <div class="samples">
-          <button class="sample">Can we open a company account if beneficial owner is not verified?</button>
-          <button class="sample">A card fraud complaint is unresolved after 90 days. What is the next action?</button>
-          <button class="sample">What KYC checks are needed for an individual customer account?</button>
-          <button class="sample">A high risk PEP customer is onboarding remotely. What controls are needed?</button>
-        </div>
+        <button class="icon-btn" type="button" id="collapseSidebar" aria-label="Collapse sidebar">
+          <svg viewBox="0 0 24 24" class="icon"><path d="M15 18 9 12l6-6"/><path d="M20 4v16"/><path d="M4 4v16"/></svg>
+        </button>
       </div>
 
-      <div class="panel">
-        <p class="eyebrow">Grounded response</p>
-        <h2>Assistant Answer</h2>
-        <div class="answer" id="answer">Run a question to see the grounded answer, citations, risk, and trace.</div>
-        <div class="meta">
-          <div class="metric"><span>Mode</span><strong id="mode">-</strong></div>
-          <div class="metric"><span>Risk</span><strong id="risk">-</strong></div>
-          <div class="metric"><span>Confidence</span><strong id="confidence">-</strong></div>
-          <div class="metric"><span>Citations</span><strong id="citations">-</strong></div>
-        </div>
-        <p class="muted" id="nextAction"></p>
-        <details>
-          <summary>View trace JSON</summary>
-          <pre id="trace">{}</pre>
-        </details>
-      </div>
-    </section>
+      <button class="new-chat" type="button" id="newChatButton">
+        <span class="source-row"><svg viewBox="0 0 24 24" class="icon"><path d="M12 5v14"/><path d="M5 12h14"/></svg>New Chat</span>
+        <span class="kbd">Ctrl K</span>
+      </button>
 
-    <section class="kb">
-      <p class="eyebrow">Synthetic KB library</p>
-      <h2>Public-Source Banking Policy Pack</h2>
-      <p class="muted">These are synthetic operating KBs created from public RBI-style regulatory facts. They are not copied client policies.</p>
-      <div class="kb-grid" id="kbGrid"></div>
-    </section>
-  </main>
+      <div class="history" aria-label="Conversation history">
+        <p class="history-title">Recent questions</p>
+        <button class="history-item" type="button">UPI fraud after 5 working days</button>
+        <button class="history-item" type="button">Beneficial owner not verified</button>
+        <button class="history-item" type="button">Card complaint unresolved 90 days</button>
+        <button class="history-item" type="button">High risk PEP onboarding</button>
+        <button class="history-item" type="button">Individual KYC checks</button>
+      </div>
+
+      <div class="tools">
+        <p class="tool-title">Tools</p>
+        <button class="tool-btn" type="button" id="refreshKbButton"><svg viewBox="0 0 24 24" class="icon"><path d="M21 12a9 9 0 0 0-15.5-6.3"/><path d="M3 4v6h6"/><path d="M3 12a9 9 0 0 0 15.5 6.3"/><path d="M21 20v-6h-6"/></svg>Refresh KB Index</button>
+        <button class="tool-btn" type="button" id="toggleSourcesButton"><svg viewBox="0 0 24 24" class="icon"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="18" r="2"/></svg>View Retrieval Trace</button>
+        <button class="tool-btn" type="button" id="kbSearchButton"><svg viewBox="0 0 24 24" class="icon"><path d="m21 21-4.3-4.3"/><circle cx="11" cy="11" r="7"/></svg>KB Search</button>
+        <button class="tool-btn" type="button"><svg viewBox="0 0 24 24" class="icon"><path d="M12 3.2 19 6v5.7c0 4.2-2.8 7.9-7 9.1-4.2-1.2-7-4.9-7-9.1V6l7-2.8Z"/><path d="m8.8 12 2.1 2.1 4.5-4.7"/></svg>FlowProof Ready</button>
+      </div>
+
+      <div class="profile">
+        <div class="avatar" aria-hidden="true">NK</div>
+        <div>
+          <strong>Nikhil K</strong>
+          <span>RAG based assistant</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <section class="chat-panel" aria-label="BankOps chat assistant">
+        <header class="topbar">
+          <div class="title-lockup">
+            <div class="logo" aria-hidden="true">B</div>
+            <div>
+              <h1>BankOps</h1>
+              <p>Indian banking operations assistant</p>
+            </div>
+          </div>
+          <div class="actions source-row">
+            <div class="modes" aria-label="Assistant modes">
+              <button class="mode-btn active" type="button" id="assistantMode">Assistant Mode</button>
+              <button class="mode-btn" type="button" id="kbMode">KB Search</button>
+            </div>
+            <span class="status-pill" id="kbStatus">8 KBs indexed</span>
+            <span class="status-pill" id="apiStatus">Offline fallback ready</span>
+          </div>
+        </header>
+
+        <div class="message-list" id="messageList" aria-live="polite">
+          <div class="hero-state" id="heroState">
+            <div>
+              <h2>BankOps</h2>
+              <p>Ask banking operations questions and get source-backed answers from synthetic RBI-based KBs. Use this as the target assistant that FlowProof evaluates.</p>
+            </div>
+            <div class="sample-row" aria-label="Suggested prompts">
+              <button class="sample-card" type="button" data-prompt="Customer reported an unauthorized UPI transaction 5 working days after the SMS alert. What should the bank operations agent do?">
+                <small>UPI</small>
+                <strong>Unauthorized transaction</strong>
+                <span>Classify customer liability and next action.</span>
+              </button>
+              <button class="sample-card" type="button" data-prompt="Can we open a company account if beneficial owner is not verified?">
+                <small>KYC</small>
+                <strong>Beneficial owner</strong>
+                <span>Check business account activation guardrails.</span>
+              </button>
+              <button class="sample-card" type="button" data-prompt="A card fraud complaint is unresolved after 90 days. What is the next action?">
+                <small>SLA</small>
+                <strong>90-day complaint</strong>
+                <span>Find escalation and compensation handling.</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="composer-wrap">
+          <form class="composer" id="composer">
+            <button class="icon-btn" type="button" id="attachButton" aria-label="Attach context">
+              <svg viewBox="0 0 24 24" class="icon"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+            </button>
+            <textarea id="questionInput" rows="1" placeholder="Ask BankOps anything..." aria-label="Ask BankOps anything"></textarea>
+            <button class="icon-btn" type="button" id="webToggleButton" aria-label="Toggle public web verification" title="Toggle public web verification">
+              <svg viewBox="0 0 24 24" class="icon"><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0Z"/><path d="M3.6 9h16.8"/><path d="M3.6 15h16.8"/><path d="M12 3a15.3 15.3 0 0 1 0 18"/><path d="M12 3a15.3 15.3 0 0 0 0 18"/></svg>
+            </button>
+            <button class="send-btn" id="sendButton" type="submit" aria-label="Send question">
+              <svg viewBox="0 0 24 24" class="icon"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <aside class="source-drawer" id="sourceDrawer" aria-label="Retrieval evidence and trace">
+        <div class="drawer-head">
+          <h2>Retrieval Evidence</h2>
+          <p>Technical details for FlowProof: citations, retrieved KB chunks, risk, confidence, and trace JSON.</p>
+        </div>
+        <div class="drawer-body">
+          <div class="empty-note" id="sourceEmpty">Ask a question to populate citations and retrieval trace.</div>
+          <div id="sourceList"></div>
+          <p class="drawer-section-title">Trace JSON</p>
+          <pre class="trace-box" id="traceJson">{}</pre>
+        </div>
+      </aside>
+    </main>
+  </div>
 
   <script>
-    const question = document.getElementById("question");
-    const ask = document.getElementById("ask");
-    const useWeb = document.getElementById("useWeb");
-    const answer = document.getElementById("answer");
-    const mode = document.getElementById("mode");
-    const risk = document.getElementById("risk");
-    const confidence = document.getElementById("confidence");
-    const citations = document.getElementById("citations");
-    const nextAction = document.getElementById("nextAction");
-    const trace = document.getElementById("trace");
-    const kbGrid = document.getElementById("kbGrid");
+    const messageList = document.getElementById("messageList");
+    const heroState = document.getElementById("heroState");
+    const composer = document.getElementById("composer");
+    const questionInput = document.getElementById("questionInput");
+    const sendButton = document.getElementById("sendButton");
+    const sourceDrawer = document.getElementById("sourceDrawer");
+    const sourceList = document.getElementById("sourceList");
+    const sourceEmpty = document.getElementById("sourceEmpty");
+    const traceJson = document.getElementById("traceJson");
+    const apiStatus = document.getElementById("apiStatus");
+    const kbStatus = document.getElementById("kbStatus");
+    const webToggleButton = document.getElementById("webToggleButton");
+    const toggleSourcesButton = document.getElementById("toggleSourcesButton");
+    const newChatButton = document.getElementById("newChatButton");
+    const refreshKbButton = document.getElementById("refreshKbButton");
+    const kbMode = document.getElementById("kbMode");
+    const assistantMode = document.getElementById("assistantMode");
+
+    let kbItems = [];
+    let useWeb = false;
+    let lastTrace = null;
 
     async function loadKb() {
       const response = await fetch("/api/kb");
       const data = await response.json();
-      kbGrid.innerHTML = data.kb.map((item) => `
-        <article class="kb-card">
-          <div class="source-row"><span class="tag">${item.id}</span><span class="tag">${item.risk}</span></div>
-          <h3>${escapeHtml(item.title)}</h3>
-          <p>${escapeHtml(item.text)}</p>
-          <div class="chips">${item.tags.slice(0, 4).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>
-        </article>
-      `).join("");
+      kbItems = data.kb || [];
+      kbStatus.textContent = `${kbItems.length} KBs indexed`;
+      renderSourcesFromKb(kbItems.slice(0, 4), { question: "KB index preview" });
     }
 
-    async function runAsk() {
-      ask.disabled = true;
-      ask.textContent = "Running...";
-      answer.textContent = "Retrieving KB context and generating answer...";
+    function addMessage(role, text, meta = {}) {
+      heroState.style.display = "none";
+      const row = document.createElement("article");
+      row.className = `message ${role}`;
+
+      const avatar = document.createElement("div");
+      avatar.className = "avatar";
+      avatar.textContent = role === "user" ? "NK" : "B";
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = text;
+
+      if (meta.citations && meta.citations.length) {
+        const metaRow = document.createElement("div");
+        metaRow.className = "bubble-meta";
+        meta.citations.forEach((citation) => {
+          const pill = document.createElement("span");
+          pill.className = "mini-pill";
+          pill.textContent = citation;
+          metaRow.appendChild(pill);
+        });
+        if (meta.risk) {
+          const risk = document.createElement("span");
+          risk.className = "mini-pill";
+          risk.textContent = `Risk: ${meta.risk}`;
+          metaRow.appendChild(risk);
+        }
+        bubble.appendChild(metaRow);
+      }
+
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      messageList.appendChild(row);
+      messageList.scrollTop = messageList.scrollHeight;
+      return bubble;
+    }
+
+    function renderSourcesFromKb(items, trace) {
+      sourceEmpty.style.display = items.length ? "none" : "block";
+      sourceList.innerHTML = items.map((item) => `
+        <article class="evidence-card">
+          <span class="mini-pill">${escapeHtml(item.id)}</span>
+          <strong>${escapeHtml(item.title || "KB passage")}</strong>
+          <p>${escapeHtml(item.text || item.source_url || "Retrieved evidence")}</p>
+        </article>
+      `).join("");
+      traceJson.textContent = JSON.stringify(trace || {}, null, 2);
+    }
+
+    function renderResponseSources(data) {
+      const retrieved = data.trace && Array.isArray(data.trace.retrieved) ? data.trace.retrieved : [];
+      const enriched = retrieved.map((item) => {
+        const match = kbItems.find((kb) => kb.id === item.id);
+        return { ...item, text: match ? match.text : item.source_url };
+      });
+      renderSourcesFromKb(enriched, data.trace || data);
+      lastTrace = data.trace || data;
+    }
+
+    async function askQuestion(prompt) {
+      const cleanPrompt = prompt.trim();
+      if (!cleanPrompt) return;
+
+      addMessage("user", cleanPrompt);
+      const pending = addMessage("assistant", "Retrieving grounded KB context...");
+      sendButton.disabled = true;
+      sendButton.innerHTML = '<span class="spinner" aria-hidden="true"></span>';
+
       try {
         const response = await fetch("/api/ask", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question: question.value, useWeb: useWeb.checked })
+          body: JSON.stringify({ question: cleanPrompt, useWeb })
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "Request failed");
-        answer.textContent = data.answer || "";
-        mode.textContent = data.mode || "-";
-        risk.textContent = data.risk || "-";
-        confidence.textContent = data.confidence || "-";
-        citations.textContent = (data.citations || []).join(", ") || "-";
-        nextAction.textContent = data.next_action ? `Next action: ${data.next_action}` : "";
-        trace.textContent = JSON.stringify(data.trace || data, null, 2);
+        pending.textContent = data.answer || "No answer returned.";
+        const metaRow = document.createElement("div");
+        metaRow.className = "bubble-meta";
+        (data.citations || []).forEach((citation) => {
+          const pill = document.createElement("span");
+          pill.className = "mini-pill";
+          pill.textContent = citation;
+          metaRow.appendChild(pill);
+        });
+        [data.risk && `Risk: ${data.risk}`, data.confidence && `Confidence: ${data.confidence}`, data.mode].filter(Boolean).forEach((label) => {
+          const pill = document.createElement("span");
+          pill.className = "mini-pill";
+          pill.textContent = label;
+          metaRow.appendChild(pill);
+        });
+        pending.appendChild(metaRow);
+        if (data.next_action) {
+          const next = document.createElement("p");
+          next.style.margin = "12px 0 0";
+          next.style.color = "var(--soft)";
+          next.textContent = `Next action: ${data.next_action}`;
+          pending.appendChild(next);
+        }
+        apiStatus.textContent = data.api_status || data.mode || "Answer ready";
+        renderResponseSources(data);
       } catch (error) {
-        answer.textContent = error.message;
+        pending.textContent = error.message;
+        apiStatus.textContent = "Request failed";
       } finally {
-        ask.disabled = false;
-        ask.textContent = "Run grounded answer";
+        sendButton.disabled = false;
+        sendButton.innerHTML = '<svg viewBox="0 0 24 24" class="icon"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>';
       }
+    }
+
+    function resetChat() {
+      messageList.querySelectorAll(".message").forEach((node) => node.remove());
+      heroState.style.display = "flex";
+      questionInput.value = "";
+      questionInput.focus();
     }
 
     function escapeHtml(value) {
       return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
     }
 
-    document.querySelectorAll(".sample").forEach((button) => {
+    composer.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const prompt = questionInput.value;
+      questionInput.value = "";
+      askQuestion(prompt);
+    });
+
+    questionInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        composer.requestSubmit();
+      }
+    });
+
+    document.querySelectorAll(".sample-card, .history-item").forEach((button) => {
       button.addEventListener("click", () => {
-        question.value = button.textContent;
+        const prompt = button.dataset.prompt || button.textContent.trim();
+        questionInput.value = prompt;
+        questionInput.focus();
       });
     });
-    ask.addEventListener("click", runAsk);
+
+    webToggleButton.addEventListener("click", () => {
+      useWeb = !useWeb;
+      webToggleButton.style.background = useWeb ? "rgba(14, 165, 160, 0.22)" : "#2b2f38";
+      apiStatus.textContent = useWeb ? "Public web verification on" : "Offline fallback ready";
+    });
+
+    toggleSourcesButton.addEventListener("click", () => {
+      sourceDrawer.classList.toggle("open");
+      if (lastTrace) traceJson.textContent = JSON.stringify(lastTrace, null, 2);
+    });
+
+    refreshKbButton.addEventListener("click", loadKb);
+    newChatButton.addEventListener("click", resetChat);
+
+    kbMode.addEventListener("click", () => {
+      kbMode.classList.add("active");
+      assistantMode.classList.remove("active");
+      sourceDrawer.classList.add("open");
+      renderSourcesFromKb(kbItems, { mode: "KB Search", kb_count: kbItems.length });
+    });
+
+    assistantMode.addEventListener("click", () => {
+      assistantMode.classList.add("active");
+      kbMode.classList.remove("active");
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.ctrlKey && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        resetChat();
+      }
+    });
+
     loadKb();
   </script>
 </body>
 </html>
+
